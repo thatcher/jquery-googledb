@@ -1,0 +1,87 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="eng" dir="ltr">
+    <head profile="http://a9.com/-/spec/opensearch/1.1/">
+        <title>A Web 1.6180339... Google Apps Engine DB Tests</title>
+		
+        <title>jquery-sdb unit tests</title>
+        <link rel="stylesheet" media="screen" href="testsuite.css"/>
+		<!-- /** server side javascripting with jquery-claypool */ -->
+		
+		<!-- 
+		/**
+		 *	The common libraries and plugins
+		 *	may be useful to the client as well
+		 *	so we simply include them from the 
+		 *	public server path
+		 */ -->
+        <script src="lib/jquery.js"                 type="text/envjs" ></script>
+        <script src="lib/jquery.claypool.js"        type="text/envjs" ></script>
+        <script src="test/jqUnit.js"                type="text/envjs" ></script>
+        <script src="test/jqunit-spec.js"           type="text/envjs" ></script>
+		
+		
+		<!-- /** these are our application specific files */ -->
+	
+		<!--
+		/**
+		 * 	- plugins -
+		 *	yup plugins work on the server side too
+		 */
+		-->
+        <script src="plugins/jquery.jspath.js"      type="text/envjs" ></script>
+        <script src="plugins/jquery.json.js"        type="text/envjs" ></script>
+        <script src="plugins/jquery.loremipsum.js"  type="text/envjs" ></script>
+        <script src="jquery.gdb.js"                 type="text/envjs" ></script>
+        <script src="jquery.gdb.rest.js"            type="text/envjs" ></script>
+	
+		<!--
+		/**
+		 *		- app/configs -
+		 * - these files are common to all projects
+		 * - giving developers the common knowledge of
+		 * - where to go to get an overview of the
+		 * - app and how to affect very general settings
+		 * - and wiring behaviors
+		 * 
+		 */
+		-->
+        <script src="app/configs/config.js"         type="text/envjs" ></script>
+        <script src="app/configs/environments.js"   type="text/envjs" ></script>
+        <script src="app/configs/logging.js"        type="text/envjs" ></script>
+        <script src="app/configs/routes.js"         type="text/envjs" ></script>
+	
+		<!-- 
+		/** 		models - views - services (controllers) - 
+		 *
+		 * Note: there are many ways to implement models 
+		 * and views in server-side jquery-claypool.  
+		 * This strategy is just an example.
+		 * 
+		 */ 
+		 -->
+        <script src="app/views/test.js"             type="text/envjs" ></script>
+        <script src="app/services/test.js"          type="text/envjs" ></script>
+	
+		<!-- 
+		/** 
+		 *	finally boot the app 
+		 */ -->
+        <script src="app/boot/server.js"            type="text/envjs" ></script> 
+        
+    </head>
+    <body id="body">
+        <h1 id="header">jquery-gdb spec</h1>
+        <h2 id="banner"></h2>
+        <h2 id="userAgent"></h2>
+            
+        <!-- Test HTML -->
+        <div id="main" style="display: none;">
+          <form id="test-form">
+            <input/>
+          </form>
+          <div id="ajax">
+            
+          </div>
+        </div>
+        <ol id="tests"></ol>
+    </body>
+</html>

@@ -1,0 +1,114 @@
+To run this projects unit tests you will need to download the google app engine
+sdk.  then simply run the dev_appserver with.
+
+bin thatcher$ ./dev_appserver.sh /path/to/jquery-gdb/
+
+Then point your browser to:
+
+http://localhost:8080/test/
+
+The Qunit tests are run server-side and the resulting dom is serialized back
+to the browser.
+
+** EVERYTHING BELOW HERE IS NOTES AND NOT IMPLEMENTED YET **
+
+= how to query =
+
+== native syntax ==
+
+ * (s is string)
+
+|| operator    |   selector  |    meaning         |  query      |
+|| native      | ---         | use native syntax  | :native(s)  |
+
+== subject (eg table/domain/entry)
+
+|| operator    |   selector  |    meaning         |  query      |
+|| #           | #id         | id                 |  #id        |
+|| .           | .class      | class              |  tags       |
+|| name        | name        | tagname            |  table name |
+
+== filter predicates and operations ==
+
+  * (t is 'table'| a is 'attribute' | v is 'value' | n is integer )
+
+|| operator    |   selector  |      meaning       |     query   | 
+||             | [a]         | defined            | [a]         |
+|| >           | ---         | before             | [a>v]       |
+|| >=          | ---         | before or equal    | [a>=v]      | 
+|| =           | [a=v]       | equal              | [a=v]       | 
+|| <           | ---         | after              | [a<v]       | 
+|| <=          | ---         | after or equal     | [a<=v]      | 
+|| !=          | [a!=v]      | is not equal to    | [a<v][v<a]  | 
+
+== filter combinations ==
+
+|| operator    |   selector  |      meaning       |     query   | 
+|| &           | t[][]       | and                | t[][]       |
+|| |           | t[],t[]     | or                 | t[],t[]     |
+
+== other operators ==
+
+|| operator    |   selector  |      meaning       |     query   | 
+|| count       | ---.length  | number of matched  | :count      |
+|| contains    | [a*=v]      | v is in values     | [a*=v]      |
+|| guid        | ---.id      | return guid        | :guid       | 
+
+== fetch operator ==
+
+|| operator    |   selector  |      meaning       |     query   | 
+|| limit       | ---         | only return 1st n  | :limit(n)   |
+|| chunk size  | ---         | limits by kb       | :chunk(n)   |
+|| offset      | ---         | start from n       | :offset(n)  |
+|| select      | ---         | limit to props     | :sift(a1,a2)|
+
+== sort operator ==
+
+|| operator    |   selector  |      meaning       |     query   | 
+|| sort        | ---         | sort results on a  | :sort(a)    |
+|| direction   | ---         | sort on a reverse  | :reverse(a) |
+
+= examples =
+
+jql     artists
+sdb     select * from artists
+gdb     new Query('artists')
+
+jql     artists[name=thenurbs]
+sdb     select * from artists where name = 'thenurbs'
+gdb     new Query('artists').addFilter('name', EQUAL, 'thenurbs')
+    
+jql     artists:count()
+sdb     select count() from artists
+gdb     new Query('artists').countEntities()
+
+jql     artists.surf
+sdb     select * from artists where 'tags' in ('surf')
+gdb     new Query('artists').addFilter('tags', EQUAL, 'surf' )
+
+jql     artists#005
+sdb     select * from artists where guid = '005'
+gdb     new Query('artists').addFilter('guid', EQUAL, '005')
+
+jql     artists.surf:guid()
+sdb     select itemName() from artists where tags in surf
+gdb     -- no raw query equivalent --
+
+jql     artists[name]
+sdb     select * from artists where 'name' is not null
+gdb     new Query('artists').addFilter('name', GREATER_THAN, '')
+
+jql     artists:sift(name, uri)
+sdb     select ('name', 'uri') from artists
+gdb     -- no raw query equivalent, use get and specify properties --
+
+jql     artists[name]:sort(name)
+sdb     select * from artists where `name` not null order by 'name'
+gdb     new Query('artists').addFilter('name', '', GREATER_THAN).addSort('name')
+
+jql     artists#005, artists.rock
+sdb     select * from artists where `guid` = '005' or `tags` in ('rock', 'surf')    
+gdb     new Query('artists').addFilter('guid', EQUAL, '005') | 
+        new Query('artists').addFilter('tags', EQUAL, 'rock') | 
+        new Query('artists').addFilter('tags', EQUAL, 'surf')  
+
