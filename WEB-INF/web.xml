@@ -58,7 +58,11 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>rhino-dispatcher</servlet-name>
-        <url-pattern>/test/</url-pattern>  
+        <url-pattern>/specs/</url-pattern>  
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/specs/*</url-pattern>  
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>rhino-dispatcher</servlet-name>
@@ -67,6 +71,14 @@
     <servlet-mapping>
         <servlet-name>rhino-dispatcher</servlet-name>
         <url-pattern>/rest/*</url-pattern> 
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/manage/</url-pattern> 
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/manage/*</url-pattern> 
     </servlet-mapping>
     
 	<!-- Sessions are available but not required for this example -->

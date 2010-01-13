@@ -9,14 +9,11 @@
 	//______________________________________________________________________________________//
 	$.env({
 	    defaults:{
-			context_dir:cwd,
-            app_dir:'/WEB-INF/jsx/',
-			templates:'file:'+cwd+'templates/',
-            dataType:'text',
             db:'jQuery.gdb',
             dbclient:'direct',
             dbconnection:{'default':{
-            }}
+            }},
+            data:'http://localhost:8080/data/'
 	    },
 	    //-------------------------------------------------------------------------------------//
 	    //  -   DEVELOPMENT CONFIGURATION   -
@@ -37,9 +34,18 @@
 	    //______________________________________________________________________________________//
 	    appengine:{
 	        server:{
-	            templates:'http://jquery-gdb.appspot.com/templates/'
 	        }
-	    }
+	    },
+        //-------------------------------------------------------------------------------------//
+        //  -   TEST CONFIGURATION   -
+        //______________________________________________________________________________________//
+        test:{
+            server:{
+            },
+            client:{
+                dbclient:'rest',
+            }
+        }
 	}); 
     
 })(jQuery);

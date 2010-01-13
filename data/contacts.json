@@ -1,0 +1,31 @@
+[{
+    "$id":          'c000',
+    "$class":       ['friend', 'work'],
+    "firstname":    "Jason",
+    "lastname":     "Jones",
+    "city":         "San Francisco",
+    "state":        "CA",
+    "zipcode":      '94121',
+    "address":      "444 Columbus Ave",
+    "email":        ["jason@sf.com", "sjones@adobe.com"]
+}, {
+    "$id":          'c001',
+    "$class":       ['friend'],
+    "firstname":    "Briana",
+    "lastname":     "Banks",
+    "city":         "Los Angeles",
+    "state":        "CA",
+    "zip":          '94001',
+    "address":      "333 West Muenster Ave, apt 123B",
+    "email":        ["bbanks@wm.com", "bb@blahdeeblah.com"]
+}, {
+    "$id":          'c002',
+    "$class":       ['school'],
+    "firstname":    "David",
+    "lastname":     "Duncan",
+    "city":         "Denver",
+    "state":        "C0",
+    "zip":          '80120',
+    "address":      "555 East 3rd Street Apt. B",
+    "email":        ["duncan@awegiwg.com", "dd@example.org"]
+}]

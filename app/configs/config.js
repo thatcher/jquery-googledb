@@ -6,7 +6,8 @@
 	
    $.scan([
        "GAE.Services",
-       "GAE.Views"
+       "GAE.Views",
+       "GAE.Models"
     ]);
     
 })(jQuery);

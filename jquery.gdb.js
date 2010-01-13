@@ -410,11 +410,11 @@
                 for(i=0;i<ors.length;i++){
                     select = ors[i];
                     select = select.replace('Query', '$G.Query').
-                        replace('EQUAL', '$G.Query.FilterOperator.EQUAL','g').
-                        replace('GREATER_THAN', '$G.Query.FilterOperator.GREATER_THAN','g').
-                        replace('GREATER_THAN_OR_EQUAL', '$G.Query.FilterOperator.GREATER_THAN_OR_EQUAL','g').
-                        replace('LESS_THAN', '$G.Query.FilterOperator.LESS_THAN','g').
-                        replace('LESS_THAN_OR_EQUAL', '$G.Query.FilterOperator.LESS_THAN_OR_EQUAL','g');
+                        replace('$GREATER_THAN_OR_EQUAL', '$G.Query.FilterOperator.GREATER_THAN_OR_EQUAL','g').
+                        replace('$GREATER_THAN', '$G.Query.FilterOperator.GREATER_THAN','g').
+                        replace('$LESS_THAN_OR_EQUAL', '$G.Query.FilterOperator.LESS_THAN_OR_EQUAL','g').
+                        replace('$LESS_THAN', '$G.Query.FilterOperator.LESS_THAN','g').
+                        replace('$EQUAL', '$G.Query.FilterOperator.EQUAL','g');
                 }
                 log.debug('find native:\n\t %s', select);
                 results = this.entityManager.

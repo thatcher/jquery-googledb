@@ -25,10 +25,11 @@
 (function($){ 
     
    $.logging([
-        { category:"GAE.Services",                      level:"DEBUG" },
+        { category:"GAE",                               level:"DEBUG" },
         { category:"Claypool",                          level:"INFO" },
         { category:"Claypool.Application",              level:"INFO" },
         { category:"Claypool.Server",                   level:"INFO" },
+        { category:"Claypool.Server.RestServlet",       level:"DEBUG" },
         { category:"Claypool.MVC",                      level:"INFO" },
         { category:"Claypool.IoC",                      level:"INFO" },
         { category:"Claypool.AOP",                      level:"INFO" },

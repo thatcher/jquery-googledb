@@ -2,8 +2,7 @@
     <head profile="http://a9.com/-/spec/opensearch/1.1/">
         <title>A Web 1.6180339... Google Apps Engine DB Tests</title>
 		
-        <title>jquery-sdb unit tests</title>
-        <link rel="stylesheet" media="screen" href="testsuite.css"/>
+        <link rel="stylesheet" media="screen" href="/test/testsuite.css"/>
 		<!-- /** server side javascripting with jquery-claypool */ -->
 		
 		<!-- 
@@ -46,6 +45,7 @@
 		-->
         <script src="app/configs/config.js"         type="text/envjs" ></script>
         <script src="app/configs/environments.js"   type="text/envjs" ></script>
+        <script src="app/configs/filters.js"        type="text/envjs" ></script>
         <script src="app/configs/logging.js"        type="text/envjs" ></script>
         <script src="app/configs/routes.js"         type="text/envjs" ></script>
 	
@@ -58,8 +58,12 @@
 		 * 
 		 */ 
 		 -->
+        <script src="app/models/contacts.js"        type="text/envjs" ></script>
+        <script src="app/models/test.js"            type="text/envjs" ></script>
         <script src="app/views/test.js"             type="text/envjs" ></script>
+        <script src="app/views/manage.js"           type="text/envjs" ></script>
         <script src="app/services/test.js"          type="text/envjs" ></script>
+        <script src="app/services/manage.js"        type="text/envjs" ></script>
 	
 		<!-- 
 		/** 
