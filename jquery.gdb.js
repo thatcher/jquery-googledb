@@ -48,7 +48,7 @@
             log.debug('creating domain %s', options.domain);
             var entity = new $G.Entity('jquery_gdb', options.domain);
             entity.setProperty('kind', options.domain);
-            entity.setProperty('timestamp', new Date().getTime());
+            entity.setProperty('timestamp', $.guid());
             
             var key = this.entityManager.put(entity);
             log.debug('created domain metadata entry %s (%s)', 
@@ -56,7 +56,7 @@
                 
             return options.success({
                 db:      version,
-                request:    new Date().getTime(),
+                request:    $.guid(),
                 domain:     options.domain,
                 cpu:        'n/a'
             });
@@ -78,7 +78,7 @@
                     
             return options.success({
                 db:      version,
-                request:    new Date().getTime(),
+                request:    $.guid(),
                 domain:     options.domain,
                 count:      count,
                 timestamp:  timestamp,
@@ -115,7 +115,7 @@
                 
                 return options.success({
                     db:      version,
-                    request:    new Date().getTime(),
+                    request:    $.guid(),
                     domain:     options.domain,
                     cpu:        'n/a'
                 });
@@ -183,7 +183,7 @@
                     options.domain, options.id);
                 return options.success({
                     db:      version,
-                    request:    new Date().getTime(),
+                    request:    $.guid(),
                     domain:     options.domain,
                     id:         options.id,
                     cpu:        'n/a'
@@ -213,6 +213,13 @@
                         id = options.data[i].$id;
                         //each prop in options.data is an id and its value is the 
                         //object to store
+                        if(id === undefined){
+                            log.warn("no id specified!!");
+                            try{
+                                log.warn('%s',jsPath.js2json(options.data[i], null, '\t'));
+                            }catch(e){}
+                            id = 'gdb_'+$.guid();
+                        }
                         log.debug('saving item %s to domain %s', id, options.domain);
                         //PutAttributes
                         entity = new $G.Entity(options.domain, id);
@@ -224,7 +231,7 @@
                     }
                     return options.success({
                         db:      version,
-                        request:    new Date().getTime(),
+                        request:    $.guid(),
                         domain:     options.domain,
                         cpu:        'n/a'
                     });
@@ -246,7 +253,7 @@
                     this.entityManager.put(entity);
                     return options.success({
                         db:      version,
-                        request:    new Date().getTime(),
+                        request:    $.guid(),
                         domain:     options.domain,
                         id:         options.id,
                         cpu:        'n/a'
@@ -314,7 +321,7 @@
                 }
                 return options.success({
                     db:      version,
-                    request:    new Date().getTime(),
+                    request:    $.guid(),
                     cpu:        'n/a',
                     domains:    list
                 });
@@ -338,7 +345,7 @@
                 }
                 return options.success({
                     db:      version,
-                    request:    new Date().getTime(),
+                    request:    $.guid(),
                     cpu:        'n/a',
                     data:        list
                 });
@@ -365,14 +372,15 @@
                 }
                 return options.success({
                     db:      version,
-                    request:    new Date().getTime(),
+                    request:    $.guid(),
                     cpu:        'n/a',
                     domain:     options.domain,
                     id:         options.id,
-                    data:        list
+                    data:       list
                 });
-            }else if(options.id && options.domain && typeof(options.id)=='string'){
+            }else if(options.id  && options.domain && typeof(options.id)=='string'){
                 //retrieves a single item
+                log.debug('getting /|:%s|/|:%s|', options.domain, options.id);
                 key = $G.KeyFactory.createKey(options.domain, options.id);
                 entity = this.entityManager.get(key);
                 if(options.data !== undefined && options.length > 0){
@@ -385,12 +393,14 @@
                 
                 return options.success({
                     db:      version,
-                    request:    new Date().getTime(),
+                    request:    $.guid(),
                     cpu:        'n/a',
                     domain:     options.domain,
                     id:         options.id,
-                    data:        [data]
+                    data:       [data]
                 });
+            }else{
+                log.warn('invalid options %s', jsPath.js2json(options,null,4));
             }
         },
         /**
@@ -405,6 +415,7 @@
                 i;
             //requires options.select
             data = [];
+            log.debug('selecting expression %s', options.select);
             if(options.select && options.select.match(validQuery)){
                 ors = options.select.split('|');
                 for(i=0;i<ors.length;i++){
@@ -431,7 +442,7 @@
             }
             return options.success({
                 db:      version,
-                request:    new Date().getTime(),
+                request:    $.guid(),
                 cpu:        'n/a',
                 data:        data
             });
@@ -529,24 +540,42 @@
         
         data = {};
         for(i=0;i<props.length;i++ ){
-            prop = entity.getProperty(props[i]);
-            log.debug('converting property %s (typeof %s)', props[i], prop['class'] );
-            if(prop instanceof java.util.Collection){
-                //ugly way to detect if object is single or multi valued
-                prop = (java.util.ArrayList)(prop).toArray();
-                data[props[i]] = [];
-                log.debug('item[%s] is multi-valued (%s)', props[i], prop.length);
-                for(j=0;j<prop.length;j++){
-                    data[props[i]][j] = prop[j];
-                    log.debug('item[%s] has prop %s %s', i, props[i], prop[j]);
-                }
-            }else{
-                //single valued
-                data[props[i]] = prop;
-                log.debug('item[%s] is %s', props[i], data[props[i]]);
-            }
+            log.debug('entity has property %s', props[i]);
+            prop = field2js(props[i], entity.getProperty(props[i]));
+            
+            data[props[i]] = prop;
+            log.debug('item[%s] is %s', props[i], data[props[i]]);
         }
         return data;
+    };
+    
+    function field2js(name, value){
+        var jsArray, j;
+        log.debug('converting property %s (typeof %s)', name, value?value['class']:'undefined' );
+        if(value instanceof $G.Text){
+            //long text field
+            log.debug('Text');
+            return value.getValue()+'';
+        }else if(value instanceof java.util.Collection){
+            log.debug('Collection');
+            //ugly way to detect if object is single or multi valued
+            jsArray = [];
+            value = (java.util.ArrayList)(value).toArray();
+            log.debug('item[%s] is multi-valued (%s)', name, value.length);
+            for(j=0;j<value.length;j++){
+                jsArray.push( field2js(name, value[j]) );
+                log.debug('item[%s] has prop %s %s', i, name, value[j]);
+            }
+            return jsArray;
+        }else if(value instanceof java.lang.String){
+            //short field
+            log.debug('String');
+            return value+'';
+        }else{
+            log.debug('Other');
+            //single valued and basic type
+            return value;
+        }
     };
     
     function js2entity(data, entity, update){
@@ -565,7 +594,7 @@
                     collection = new java.util.ArrayList();
                 }
                 for(i = 0; i< data[prop].length;i++){
-                    collection.add(data[prop][i]);
+                    collection.add(js2field(data[prop][i]));
                 }
                 entity.setProperty(prop, collection);
             }else{
@@ -577,23 +606,32 @@
                         log.debug('adding value to entity by converting property to list');
                         //was a single value but is now a multi value
                         collection = new java.util.ArrayList();
-                        collection.add(entity.getProperty(prop)+'');
-                        collection.add(data[prop]);
+                        collection.add(js2field(entity.getProperty(prop)));
+                        collection.add(js2field(data[prop]));
                         entity.setProperty(prop, collection);
                     }else{
                         //was multi value already
                         log.debug('adding value to existing property list');
                         entity.setProperty(prop, (java.util.ArrayList)(entity.getProperty(prop)).
-                                add(data[prop])+'');
+                                add(js2field(data[prop])));
                     }
                 }else{
                     //entity prop is single valued
                     log.debug('reseting value %s for property %s', prop, data[prop]);
-                    entity.setProperty(prop, data[prop]+'');
+                    entity.setProperty(prop, js2field(data[prop]));
                 }
             }
         }
     };
+    
+    function js2field(value){
+        if(typeof(value) == 'string'  && value.length > 256){
+            log.debug('using Text for value ', value);
+            return new $G.Text(value);
+        }else{
+            return value;
+        }
+    }
     
     var subjects = {
 
