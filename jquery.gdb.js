@@ -1,5 +1,5 @@
 /**
- * SDB Implementation for jQuery
+ * GDB Implementation for jQuery
  * @author thatcher
  */
 (function($, $G){
@@ -48,7 +48,7 @@
             log.debug('creating domain %s', options.domain);
             var entity = new $G.Entity('jquery_gdb', options.domain);
             entity.setProperty('kind', options.domain);
-            entity.setProperty('timestamp', $.guid());
+            entity.setProperty('timestamp', $.uuid());
             
             var key = this.entityManager.put(entity);
             log.debug('created domain metadata entry %s (%s)', 
@@ -56,7 +56,7 @@
                 
             return options.success({
                 db:      version,
-                request:    $.guid(),
+                request:    $.uuid(),
                 domain:     options.domain,
                 cpu:        'n/a'
             });
@@ -78,7 +78,7 @@
                     
             return options.success({
                 db:      version,
-                request:    $.guid(),
+                request:    $.uuid(),
                 domain:     options.domain,
                 count:      count,
                 timestamp:  timestamp,
@@ -97,9 +97,14 @@
                 i;
             if (options.domain) {
                 log.debug('destroying gdb domain %s', options.domain);
-                entity = this.entityManager.get(
-                    $G.KeyFactory.createKey('jquery_gdb', options.domain));
-                this.entityManager['delete'](entity.getKey());
+                try{
+                    entity = this.entityManager.get(
+                        $G.KeyFactory.createKey('jquery_gdb', options.domain));
+                    this.entityManager['delete'](entity.getKey());
+                }catch(e){
+                    log.error('error deleting meta record %s', options.domain).
+                        exception(e);
+                }
                 
                 select = $G.Query(options.domain);
                 results = this.entityManager.prepare(select.setKeysOnly()).
@@ -115,7 +120,7 @@
                 
                 return options.success({
                     db:      version,
-                    request:    $.guid(),
+                    request:    $.uuid(),
                     domain:     options.domain,
                     cpu:        'n/a'
                 });
@@ -183,7 +188,7 @@
                     options.domain, options.id);
                 return options.success({
                     db:      version,
-                    request:    $.guid(),
+                    request:    $.uuid(),
                     domain:     options.domain,
                     id:         options.id,
                     cpu:        'n/a'
@@ -209,6 +214,7 @@
                 if (!options.id && options.batch && options.domain) {
                     //  - no options.id implies a batch operation
                     // BatchPutAttributes
+                    this.create(options);
                     for(i=0;i<options.data.length;i++){
                         id = options.data[i].$id;
                         //each prop in options.data is an id and its value is the 
@@ -218,7 +224,7 @@
                             try{
                                 log.warn('%s',jsPath.js2json(options.data[i], null, '\t'));
                             }catch(e){}
-                            id = 'gdb_'+$.guid();
+                            id = 'gdb_'+$.uuid();
                         }
                         log.debug('saving item %s to domain %s', id, options.domain);
                         //PutAttributes
@@ -231,7 +237,7 @@
                     }
                     return options.success({
                         db:      version,
-                        request:    $.guid(),
+                        request:    $.uuid(),
                         domain:     options.domain,
                         cpu:        'n/a'
                     });
@@ -253,7 +259,7 @@
                     this.entityManager.put(entity);
                     return options.success({
                         db:      version,
-                        request:    $.guid(),
+                        request:    $.uuid(),
                         domain:     options.domain,
                         id:         options.id,
                         cpu:        'n/a'
@@ -321,7 +327,7 @@
                 }
                 return options.success({
                     db:      version,
-                    request:    $.guid(),
+                    request:    $.uuid(),
                     cpu:        'n/a',
                     domains:    list
                 });
@@ -345,16 +351,37 @@
                 }
                 return options.success({
                     db:      version,
-                    request:    $.guid(),
+                    request:    $.uuid(),
                     cpu:        'n/a',
                     data:        list
                 });
+            }else if(options.id  && options.domain && typeof(options.id)=='string'){
+                //retrieves a single item
+                log.debug('getting /|:%s|/|:%s|', options.domain, options.id);
+                key = $G.KeyFactory.createKey(options.domain, options.id);
+                entity = this.entityManager.get(key);
+                if(options.data !== undefined && options.length > 0){
+                    props = options.data;
+                }else{
+                    props = entity.getProperties().keySet().toArray();
+                }
+                
+                data = entity2js(entity, props);
+                
+                return options.success({
+                    db:      version,
+                    request:    $.uuid(),
+                    cpu:        'n/a',
+                    domain:     options.domain,
+                    id:         options.id,
+                    data:       [data]
+                });
             }else if(options.id && !(typeof(options.id) == 'string') && options.domain ){
                 //retrieves a list of items
-                log.debug('getting list of items by id %s', options.id);
+                log.debug('getting list of items by id %s (%s)', options.id, typeof(options.id));
                 list = new java.util.ArrayList();
                 for(i=0;i<options.id.length;i++){
-                    list.add(new $G.KeyFactory.createKey(options.domain, options.id[i]))
+                    list.add(new $G.KeyFactory.createKey(options.domain, options.id[i]));
                 }
                 results = this.entityManager.get(list);
                 keys = results.keySet().toArray();
@@ -372,32 +399,11 @@
                 }
                 return options.success({
                     db:      version,
-                    request:    $.guid(),
+                    request:    $.uuid(),
                     cpu:        'n/a',
                     domain:     options.domain,
                     id:         options.id,
                     data:       list
-                });
-            }else if(options.id  && options.domain && typeof(options.id)=='string'){
-                //retrieves a single item
-                log.debug('getting /|:%s|/|:%s|', options.domain, options.id);
-                key = $G.KeyFactory.createKey(options.domain, options.id);
-                entity = this.entityManager.get(key);
-                if(options.data !== undefined && options.length > 0){
-                    props = options.data;
-                }else{
-                    props = entity.getProperties().keySet().toArray();
-                }
-                
-                data = entity2js(entity, props);
-                
-                return options.success({
-                    db:      version,
-                    request:    $.guid(),
-                    cpu:        'n/a',
-                    domain:     options.domain,
-                    id:         options.id,
-                    data:       [data]
                 });
             }else{
                 log.warn('invalid options %s', jsPath.js2json(options,null,4));
@@ -442,7 +448,7 @@
             }
             return options.success({
                 db:      version,
-                request:    $.guid(),
+                request:    $.uuid(),
                 cpu:        'n/a',
                 data:        data
             });
@@ -571,10 +577,14 @@
             //short field
             log.debug('String');
             return value+'';
+        }else if(value instanceof java.lang.Boolean){
+            //short field
+            log.debug('Boolean');
+            return !!value;
         }else{
             log.debug('Other');
             //single valued and basic type
-            return value;
+            return value+'';
         }
     };
     
