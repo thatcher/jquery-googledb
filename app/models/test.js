@@ -43,7 +43,7 @@
                         }
                     });
                     
-                }).should('get a list of available sdb domains',function(){
+                }).should('get a list of available db domains',function(){
             
                     db.get({
                         async: false,
